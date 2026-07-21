@@ -1,6 +1,5 @@
 import streamlit as st
-
-from services.board_service import BoardService
+from board_service import BoardService
 from data_processor import process_deals
 from ai_assistant import answer_question
 

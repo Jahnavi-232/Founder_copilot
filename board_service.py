@@ -1,20 +1,44 @@
 from monday.client import MondayClient
-from monday.queries import GET_BOARD_ITEMS
-from config import DEALS_BOARD_ID, WORK_ORDERS_BOARD_ID
+from queries import DEALS_QUERY
 
 
 class BoardService:
+
     def __init__(self):
         self.client = MondayClient()
 
-    def get_deals(self):
-        return self.client.execute_query_with_variables(
-            GET_BOARD_ITEMS,
-            {"boardId": DEALS_BOARD_ID}
-        )
 
-    def get_work_orders(self):
-        return self.client.execute_query_with_variables(
-            GET_BOARD_ITEMS,
-            {"boardId": WORK_ORDERS_BOARD_ID}
-        )
+    def get_deals(self):
+
+        response = self.client.query(DEALS_QUERY)
+
+        try:
+
+            items = (
+                response
+                ["data"]
+                ["boards"][0]
+                ["items_page"]
+                ["items"]
+            )
+
+            deals = []
+
+            for item in items:
+
+                deal = {
+                    "name": item["name"]
+                }
+
+                for column in item["column_values"]:
+                    deal[column["id"]] = column["text"]
+
+                deals.append(deal)
+
+
+            return deals
+
+
+        except Exception as e:
+            print(response)
+            raise e
